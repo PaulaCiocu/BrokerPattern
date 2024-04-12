@@ -38,10 +38,11 @@ public class Requestor
 			oStr.close();
 			s.close();
 		}
-		catch (IOException e) { 
+		catch (IOException e) {
 			System.out.println("IOException in deliver_and_wait_feedback"); }
 			return buffer;
 	}
+
 
 }
 

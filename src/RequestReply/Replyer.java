@@ -15,7 +15,7 @@ public class Replyer
 	private InputStream iStr;
 	private OutputStream oStr;
 	private String myName;
-        private Address myAddr;
+	private Address myAddr;
 	
 	public Replyer(String theName, Address theAddr) {
               myName = theName; 

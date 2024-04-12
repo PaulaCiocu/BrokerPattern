@@ -4,6 +4,11 @@ import MessageMarshaller.*;
 import Registry.*;
 import Commons.Address;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.ServerSocket;
+
 
 class ServerTransformer implements ByteStreamTransformer
 {
@@ -41,30 +46,32 @@ class MessageServer
 
 public class InfoServer
 {
-	public static void main(String args[])
-	{
+
+
+	public static void main(String[] args) {
+
 		new Configuration();
 
-		Address dispatcher= Registry.instance().get("Dispatcher");
+		Address dispatcher = Registry.instance().get("Dispatcher");
 
-		Message msg= new Message("Server","REQ InfoServer 1111 127.0.0.1");
+		Message msg = new Message("Server", "REQ InfoServer 1111 127.0.0.1");
 		Requestor s_d = new Requestor("Server");
 		Marshaller m = new Marshaller();
 		byte[] bytes = m.marshal(msg);
 		bytes = s_d.deliver_and_wait_feedback(dispatcher, bytes);
 		Message answer = m.unmarshal(bytes);
-		System.out.println("Server received message "+answer.data+" from "+answer.sender);
-		//ByteStreamTransformer transformer = new ServerTransformer(new MessageServer());
-
-		//Address myAddr = Registry.instance().get("Server");
-
-		//Replyer r = new Replyer("Server", myAddr);
-
-		//while (true) {
-		//	r.receive_transform_and_send_feedback(transformer);
-		//}
+		System.out.println("Server received message " + answer.data + " from " + answer.sender);
 
 
+		ByteStreamTransformer transformer = new ServerTransformer(new MessageServer());
+
+		Entry myAddr = new Entry("127.0.0.1", 1111);
+		ServerReplyer r = new ServerReplyer("Server", myAddr);
+
+		while (true) {
+			r.receive_transform_and_send_feedback(transformer);
+		}
 	}
+
 
 }

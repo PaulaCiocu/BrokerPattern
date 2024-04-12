@@ -50,10 +50,10 @@ class MessageDispatcher
             String name =words[1];
 
             System.out.println("you are a server");
-            Entry registerAddress =new Entry(dest,port);
-            Registry.instance().put(name, registerAddress);
+            Address registerAddress =new Entry(dest,port);
 
             serverRegistry.put(name,registerAddress);
+            registerAddress =null;
             answer = new Message("Dispatcher", "I recorded " + serverRegistry.get(name).port() + " " + serverRegistry.get(name).dest());
         }
         else if(words[0].equals("GETADDR")){
