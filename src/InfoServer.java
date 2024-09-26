@@ -4,9 +4,11 @@ import MessageMarshaller.*;
 import Registry.*;
 import Commons.Address;
 
+import javax.print.DocFlavor;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.lang.reflect.Method;
 import java.net.ServerSocket;
 
 
@@ -36,42 +38,37 @@ class ServerTransformer implements ByteStreamTransformer
 
 class MessageServer
 {
-	public Message get_answer(Message msg)
-	{
-		System.out.println("Server received " + msg.data + " from " + msg.sender);
-		Message answer = new Message("Server", "I am alive");
+	Object weather;
+	public MessageServer(Object weather){
+		this.weather = weather;
+	}
+	public Message get_answer(Message msg) {
+		Message answer;
+		String[] words = msg.data.split("\\s+");
+
+		try {
+			Class<?> weatherClass = weather.getClass();
+			Method method = weatherClass.getMethod(words[0]);
+
+			Object result = method.invoke(weather);
+			answer = new Message("Server", result.toString());
+			System.out.println("Server received " + msg.data + " from " + msg.sender);
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+
 		return answer;
 	}
 }
 
+
 public class InfoServer
 {
-
-
 	public static void main(String[] args) {
-
-		new Configuration();
-
-		Address dispatcher = Registry.instance().get("Dispatcher");
-
-		Message msg = new Message("Server", "REQ InfoServer 1111 127.0.0.1");
-		Requestor s_d = new Requestor("Server");
-		Marshaller m = new Marshaller();
-		byte[] bytes = m.marshal(msg);
-		bytes = s_d.deliver_and_wait_feedback(dispatcher, bytes);
-		Message answer = m.unmarshal(bytes);
-		System.out.println("Server received message " + answer.data + " from " + answer.sender);
-
-
-		ByteStreamTransformer transformer = new ServerTransformer(new MessageServer());
-
-		Entry myAddr = new Entry("127.0.0.1", 1111);
-		ServerReplyer r = new ServerReplyer("Server", myAddr);
-
-		while (true) {
-			r.receive_transform_and_send_feedback(transformer);
-		}
+		Object weather = new WeatherDataCenter();
+		BrokerLibrary.rebind("InfoServer",1111, "127.0.1.0 ",weather);
 	}
-
 
 }

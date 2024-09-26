@@ -44,7 +44,7 @@ class MessageDispatcher
 
         if(words[0].equals("REQ")){
 
-            System.out.println(words[0] + " " + words[1] + " " + words[2] + words[3]);
+            System.out.println(words[0] + " " + words[1] + " " + words[2] + " " + words[3]);
             int port = Integer.parseInt(words[2]);
             String dest = words[3];
             String name =words[1];
